@@ -1,0 +1,49 @@
+# Copy this file to config.yaml and update values
+server:
+  port: "8080"
+  mode: "debug"
+  trusted_proxies:
+    - "127.0.0.1"
+    - "::1"
+
+
+jwt:
+  secret: "your-secret-key-here"
+  access_expire_minute: 15
+  refresh_expire_day: 7
+
+log:
+  level: "debug"  # debug | info | warn | error
+
+db:
+  # Supported drivers: mysql | postgres | sqlite
+  driver: "mysql"
+  dsn: "user:password@tcp(127.0.0.1:3306)/codebasego?charset=utf8mb4&parseTime=True&loc=Local"
+  # For postgres: "host=localhost user=postgres password=postgres dbname=app port=5432 sslmode=disable"
+  # For sqlite:   "app.db"
+  # Set true for Local/Dev (GORM AutoMigrate), false for Staging/Prod (use SQL migrations in ./migrations)
+  auto_migrate: true
+
+rate_limit:
+  enabled: true
+  rps: 20
+  burst: 40
+
+cors:
+  allow_origins:
+    - "*"
+  allow_methods:
+    - "GET"
+    - "POST"
+    - "PUT"
+    - "DELETE"
+    - "OPTIONS"
+    - "PATCH"
+  allow_headers:
+    - "Content-Type"
+    - "Authorization"
+    - "X-Requested-With"
+    - "X-Request-ID"
+    - "X-Correlation-ID"
+  allow_credentials: false
+  max_age: 86400

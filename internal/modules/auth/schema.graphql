@@ -1,0 +1,36 @@
+# GraphQL Schema for Auth Module
+
+type TokenPair {
+  access_token: String!
+  refresh_token: String!
+  expires_in: Int!
+  token_type: String!
+}
+
+input RegisterInput {
+  email: String!
+  password: String!
+  name: String!
+}
+
+input LoginInput {
+  email: String!
+  password: String!
+}
+
+extend type Mutation {
+  """Register a new user (public)"""
+  register(input: RegisterInput!): TokenPair!
+
+  """Login (public)"""
+  login(input: LoginInput!): TokenPair!
+
+  """Refresh access token (public)"""
+  refreshToken(refresh_token: String!): TokenPair!
+
+  """Logout / revoke refresh token (public)"""
+  logout(refresh_token: String!): Message!
+
+  """Logout from all devices (authenticated)"""
+  logoutAll: Message!
+}

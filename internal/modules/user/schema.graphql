@@ -1,0 +1,33 @@
+# GraphQL Schema for User Module
+
+type User {
+  id: ID!
+  email: String!
+  name: String!
+  created_at: String!
+  updated_at: String!
+}
+
+input UpdateUserInput {
+  email: String
+  name: String
+}
+
+extend type Query {
+  """Get the currently authenticated user"""
+  me: User!
+
+  """Get paginated users (requires auth)"""
+  users(page: Int, limit: Int): [User!]!
+
+  """Get a user by ID (requires auth)"""
+  user(id: ID!): User!
+}
+
+extend type Mutation {
+  """Update a user by ID (requires auth)"""
+  updateUser(id: ID!, input: UpdateUserInput!): User!
+
+  """Delete a user by ID (requires auth)"""
+  deleteUser(id: ID!): Message!
+}

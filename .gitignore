@@ -1,0 +1,41 @@
+# Binaries
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+bin/
+/api
+api
+
+# Test
+*.test
+*.out
+coverage.html
+
+# Dependency directories
+vendor/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+.env.local
+
+# Wire generated (re-generate with `make wire`)
+# cmd/api/wire_gen.go
+
+# Swagger generated (re-generate with `make swagger`)
+# docs/
+
+# Build output
+tmp/

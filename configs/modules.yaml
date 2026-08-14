@@ -1,0 +1,20 @@
+# ==============================================================================
+# MODULE REGISTRY & ACTIVATION CONFIGURATION
+# ==============================================================================
+# Run 'make setup' to sync this file, regenerate DI wiring, and compile.
+# Set 'enabled: false' to disable a module without deleting its code.
+# ==============================================================================
+
+modules:
+    auth:
+        enabled: true
+        description: Authentication, JWT Token rotation & Reuse detection
+    graphql:
+        enabled: true
+        description: GraphQL API queries, mutations & Playground UI
+    health:
+        enabled: true
+        description: Health check & Database connectivity probe
+    user:
+        enabled: true
+        description: User CRUD management & Cursor pagination
