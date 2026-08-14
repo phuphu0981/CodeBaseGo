@@ -1,4 +1,4 @@
-.PHONY: run build setup wire swagger test clean install-tools migrate-up migrate-down migrate-status
+.PHONY: run build setup wire swagger test clean install-tools migrate-up migrate-down migrate-status check archcheck fmt lint deps
 
 # Migration configuration (Default: MySQL)
 DB_DRIVER ?= mysql
@@ -42,11 +42,19 @@ migrate-status:
 clean:
 	rm -rf bin/ tmp/
 
+# Run architecture and coding standards checker
+archcheck:
+	go run ./cmd/tools/archcheck/
+
+# Full verification: architecture check, tests, and formatting
+check: archcheck test
+
 # Install development tools
 install-tools:
 	go install github.com/google/wire/cmd/wire@latest
 	go install github.com/swaggo/swag/cmd/swag@latest
 	go install github.com/pressly/goose/v3/cmd/goose@latest
+	go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
 
 # Format code
 fmt:
@@ -54,7 +62,7 @@ fmt:
 
 # Lint code
 lint:
-	golangci-lint run ./...
+	@which golangci-lint > /dev/null 2>&1 && golangci-lint run ./... || echo "golangci-lint is not installed. Run 'make install-tools' to install."
 
 # Download dependencies
 deps:
