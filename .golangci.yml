@@ -1,0 +1,84 @@
+run:
+  timeout: 5m
+  modules-download-mode: readonly
+  skip-dirs:
+    - docs
+    - bin
+    - tmp
+  skip-files:
+    - ".*_gen\\.go$"
+    - ".*exec\\.go$"
+
+output:
+  format: colored-line-number
+  print-issued-lines: true
+  print-linter-name: true
+
+linters:
+  enable:
+    - errcheck
+    - gosimple
+    - govet
+    - ineffassign
+    - staticcheck
+    - unused
+    - revive
+    - gosec
+    - depguard
+    - whitespace
+    - misspell
+
+linters-settings:
+  govet:
+    check-shadowing: true
+  revive:
+    rules:
+      - name: package-comments
+        disabled: true
+      - name: exported
+        disabled: false
+      - name: var-naming
+        disabled: false
+      - name: error-naming
+        disabled: false
+      - name: error-strings
+        disabled: false
+  depguard:
+    rules:
+      main:
+        deny:
+          - pkg: "github.com/gin-gonic/gin"
+            desc: "Service and Common layers must not import Gin (presentation layer only)."
+          - pkg: "gorm.io/gorm"
+            desc: "Handler and Service layers must not depend directly on GORM."
+      service_layer:
+        files:
+          - "**/service.go"
+        deny:
+          - pkg: "github.com/gin-gonic/gin"
+            desc: "Service layer must remain independent of web frameworks (no Gin in service)."
+      handler_layer:
+        files:
+          - "**/handler.go"
+        deny:
+          - pkg: "gorm.io/gorm"
+            desc: "Handler layer must not query database directly (no GORM in handler)."
+  errcheck:
+    check-type-assertions: true
+    check-blank: true
+
+issues:
+  exclude-use-default: false
+  max-issues-per-linter: 0
+  max-same-issues: 0
+  exclude-rules:
+    - path: _test\.go
+      linters:
+        - errcheck
+        - gosec
+    - path: internal/modules/health/
+      linters:
+        - depguard
+    - path: internal/platform/
+      linters:
+        - depguard

@@ -62,6 +62,22 @@ make swagger    # Generate docs
 # Then visit http://localhost:8080/swagger/index.html
 ```
 
+## Documentation
+
+- 📘 [Tài liệu Kiến trúc & Coding Standard](file:///var/www/html/Learner/CodebaseGo/coding_standard_and_architecture.md)
+- 🔄 [Tài liệu Luồng xử lý Request (Request Lifecycle)](file:///var/www/html/Learner/CodebaseGo/request_lifecycle.md)
+- 📖 [Hướng dẫn phát triển chi tiết (GUIDE.md)](file:///var/www/html/Learner/CodebaseGo/GUIDE.md)
+
+## Code Quality & Architecture Check
+
+Kiểm tra tuân thủ kiến trúc Modular Monolith & Clean Architecture theo [coding_standard_and_architecture.md](file:///var/www/html/Learner/CodebaseGo/coding_standard_and_architecture.md):
+
+```bash
+make archcheck   # Kiểm tra kiến trúc 4 tầng, ranh giới import, DTO bảo mật, quy ước đặt tên
+make check       # Chạy toàn bộ archcheck + unit tests
+make lint        # Chạy golangci-lint (nếu đã cài đặt)
+```
+
 ## Tech Stack
 
 - **Framework:** [Gin](https://github.com/gin-gonic/gin)
