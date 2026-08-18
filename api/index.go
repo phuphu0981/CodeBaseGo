@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"sync"
 
+	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 
@@ -83,6 +84,15 @@ func initServer() {
 	if cfg.Server.Mode != "release" && cfg.Server.Mode != "production" {
 		srv.Engine.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	}
+
+	srv.Engine.GET("/", func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{
+			"status":  "ok",
+			"message": "CodebaseGo API Serverless is running",
+			"docs":    "/swagger/index.html",
+			"health":  "/api/v1/health",
+		})
+	})
 
 	v1 := srv.Engine.Group("/api/v1")
 	authMod.RegisterRoutes(v1)
