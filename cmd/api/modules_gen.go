@@ -9,6 +9,9 @@ import (
 	"codebasego/internal/modules/auth"
 	"codebasego/internal/modules/graphql"
 	"codebasego/internal/modules/health"
+	"codebasego/internal/modules/page"
+	"codebasego/internal/modules/seo"
+	"codebasego/internal/modules/setting"
 	"codebasego/internal/modules/user"
 )
 
@@ -17,6 +20,9 @@ var EnabledModulesSet = wire.NewSet(
 	auth.ProviderSet,
 	graphql.ProviderSet,
 	health.ProviderSet,
+	page.ProviderSet,
+	seo.ProviderSet,
+	setting.ProviderSet,
 	user.ProviderSet,
 	wire.Bind(new(auth.UserService), new(*user.Service)),
 	wire.Bind(new(graphql.UserService), new(*user.Service)),
@@ -26,10 +32,16 @@ var EnabledModulesSet = wire.NewSet(
 // ProvideMigrators aggregates database auto-migrators for active modules.
 func ProvideMigrators(
 	authMod *auth.Module,
+	pageMod *page.Module,
+	seoMod *seo.Module,
+	settingMod *setting.Module,
 	userMod *user.Module,
 ) []common.Migrator {
 	return []common.Migrator{
 		authMod,
+		pageMod,
+		seoMod,
+		settingMod,
 		userMod,
 	}
 }
@@ -39,12 +51,18 @@ func ProvideRouteRegistrars(
 	authMod *auth.Module,
 	graphqlMod *graphql.Module,
 	healthMod *health.Module,
+	pageMod *page.Module,
+	seoMod *seo.Module,
+	settingMod *setting.Module,
 	userMod *user.Module,
 ) []common.RouteRegistrar {
 	return []common.RouteRegistrar{
 		authMod,
 		graphqlMod,
 		healthMod,
+		pageMod,
+		seoMod,
+		settingMod,
 		userMod,
 	}
 }

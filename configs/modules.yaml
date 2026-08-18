@@ -15,6 +15,15 @@ modules:
     health:
         enabled: true
         description: Health check & Database connectivity probe
+    page:
+        enabled: true
+        description: Dynamic CMS page content & Block-based UI layout management
+    seo:
+        enabled: true
+        description: SEO metadata management & Page slug optimization
+    setting:
+        enabled: true
+        description: Dynamic system configuration store (core_config_data) & Base URL management
     user:
         enabled: true
         description: User CRUD management & Cursor pagination

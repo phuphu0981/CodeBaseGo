@@ -51,6 +51,35 @@ definitions:
         description: e.g. "Bearer"
         type: string
     type: object
+  page.CreatePageRequest:
+    properties:
+      content:
+        type: string
+      slug:
+        type: string
+      status:
+        type: string
+      template:
+        type: string
+      title:
+        type: string
+    required:
+    - slug
+    - title
+    type: object
+  page.UpdatePageRequest:
+    properties:
+      content:
+        type: string
+      slug:
+        type: string
+      status:
+        type: string
+      template:
+        type: string
+      title:
+        type: string
+    type: object
   response.Body:
     properties:
       data: {}
@@ -59,6 +88,76 @@ definitions:
       meta: {}
       success:
         type: boolean
+    type: object
+  seo.CreateSEORequest:
+    properties:
+      canonical_url:
+        type: string
+      description:
+        type: string
+      keywords:
+        type: string
+      og_description:
+        type: string
+      og_image:
+        type: string
+      og_title:
+        type: string
+      og_type:
+        type: string
+      robots:
+        type: string
+      slug:
+        type: string
+      structured_data:
+        type: string
+      title:
+        type: string
+      twitter_card:
+        type: string
+    required:
+    - slug
+    - title
+    type: object
+  seo.UpdateSEORequest:
+    properties:
+      canonical_url:
+        type: string
+      description:
+        type: string
+      keywords:
+        type: string
+      og_description:
+        type: string
+      og_image:
+        type: string
+      og_title:
+        type: string
+      og_type:
+        type: string
+      robots:
+        type: string
+      slug:
+        type: string
+      structured_data:
+        type: string
+      title:
+        type: string
+      twitter_card:
+        type: string
+    type: object
+  setting.SetConfigRequest:
+    properties:
+      path:
+        type: string
+      scope:
+        type: string
+      scope_id:
+        type: string
+      value:
+        type: string
+    required:
+    - path
     type: object
   user.UpdateRequest:
     properties:
@@ -258,6 +357,517 @@ paths:
       summary: Readiness probe (Kubernetes /load balancer)
       tags:
       - health
+  /pages:
+    get:
+      parameters:
+      - description: Opaque cursor for pagination
+        in: query
+        name: cursor
+        type: string
+      - default: 10
+        description: Items per page for cursor pagination
+        in: query
+        name: limit
+        type: integer
+      - default: 1
+        description: Page number for offset pagination
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Items per page for offset pagination
+        in: query
+        name: per_page
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Body'
+      summary: List pages
+      tags:
+      - pages
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Page payload
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/page.CreatePageRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/response.Body'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Body'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/response.Body'
+      security:
+      - BearerAuth: []
+      summary: Create page
+      tags:
+      - pages
+  /pages/{id}:
+    delete:
+      parameters:
+      - description: Page ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Body'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.Body'
+      security:
+      - BearerAuth: []
+      summary: Delete page
+      tags:
+      - pages
+    get:
+      parameters:
+      - description: Page ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Body'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.Body'
+      summary: Get page by ID
+      tags:
+      - pages
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Page ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Page update payload
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/page.UpdatePageRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Body'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Body'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.Body'
+      security:
+      - BearerAuth: []
+      summary: Update page
+      tags:
+      - pages
+  /pages/by-slug:
+    get:
+      parameters:
+      - description: Page slug (e.g. 'home', 'about-us')
+        in: query
+        name: slug
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Body'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Body'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.Body'
+      summary: Get page by slug
+      tags:
+      - pages
+  /pages/slugs:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Body'
+      summary: Get list of published page slugs for SSG
+      tags:
+      - pages
+  /seo:
+    get:
+      parameters:
+      - description: Opaque cursor for pagination
+        in: query
+        name: cursor
+        type: string
+      - default: 10
+        description: Items per page for cursor pagination
+        in: query
+        name: limit
+        type: integer
+      - default: 1
+        description: Page number for offset pagination
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Items per page for offset pagination
+        in: query
+        name: per_page
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Body'
+      summary: List SEO records
+      tags:
+      - seo
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: SEO Metadata payload
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/seo.CreateSEORequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/response.Body'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Body'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/response.Body'
+      security:
+      - BearerAuth: []
+      summary: Create SEO record
+      tags:
+      - seo
+  /seo/{id}:
+    delete:
+      parameters:
+      - description: SEO Record ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Body'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.Body'
+      security:
+      - BearerAuth: []
+      summary: Delete SEO record
+      tags:
+      - seo
+    get:
+      parameters:
+      - description: SEO Record ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Body'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.Body'
+      summary: Get SEO record by ID
+      tags:
+      - seo
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: SEO Record ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: SEO Update payload
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/seo.UpdateSEORequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Body'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Body'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.Body'
+      security:
+      - BearerAuth: []
+      summary: Update SEO record
+      tags:
+      - seo
+  /seo/by-slug:
+    get:
+      parameters:
+      - description: Page slug (e.g. 'home', 'about-us', 'products/shoes')
+        in: query
+        name: slug
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Body'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Body'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.Body'
+      summary: Get SEO record by slug
+      tags:
+      - seo
+  /settings:
+    get:
+      parameters:
+      - description: Filter by path prefix (e.g. web/)
+        in: query
+        name: path_prefix
+        type: string
+      - description: Filter by scope
+        in: query
+        name: scope
+        type: string
+      - description: Opaque cursor for pagination
+        in: query
+        name: cursor
+        type: string
+      - default: 10
+        description: Items per page for cursor pagination
+        in: query
+        name: limit
+        type: integer
+      - default: 1
+        description: Page number for offset pagination
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Items per page for offset pagination
+        in: query
+        name: per_page
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Body'
+      security:
+      - BearerAuth: []
+      summary: List system configurations
+      tags:
+      - settings
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Config payload
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/setting.SetConfigRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Body'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Body'
+      security:
+      - BearerAuth: []
+      summary: Set configuration value
+      tags:
+      - settings
+  /settings/{id}:
+    delete:
+      parameters:
+      - description: Config ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Body'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.Body'
+      security:
+      - BearerAuth: []
+      summary: Delete config by ID
+      tags:
+      - settings
+    get:
+      parameters:
+      - description: Config ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Body'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.Body'
+      security:
+      - BearerAuth: []
+      summary: Get config by ID
+      tags:
+      - settings
+  /settings/by-path:
+    get:
+      parameters:
+      - description: Config Path (e.g. web/unsecure/base_url)
+        in: query
+        name: path
+        required: true
+        type: string
+      - default: default
+        description: Scope
+        in: query
+        name: scope
+        type: string
+      - default: "0"
+        description: Scope ID
+        in: query
+        name: scope_id
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Body'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Body'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.Body'
+      summary: Get config by path
+      tags:
+      - settings
+  /settings/public:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Body'
+      summary: Get public system configs
+      tags:
+      - settings
   /users:
     get:
       parameters:

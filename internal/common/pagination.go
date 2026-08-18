@@ -11,6 +11,13 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// Pagination default limits and bounds.
+const (
+	DefaultPage    = 1
+	DefaultPerPage = 10
+	MaxPerPage     = 100
+)
+
 type PaginationQuery struct {
 	Page    int `json:"page"`
 	PerPage int `json:"per_page"`
@@ -28,13 +35,13 @@ func NewPaginationQuery(c *gin.Context) PaginationQuery {
 	perPage, _ := strconv.Atoi(c.DefaultQuery("per_page", "10"))
 
 	if page < 1 {
-		page = 1
+		page = DefaultPage
 	}
 	if perPage < 1 {
-		perPage = 10
+		perPage = DefaultPerPage
 	}
-	if perPage > 100 {
-		perPage = 100
+	if perPage > MaxPerPage {
+		perPage = MaxPerPage
 	}
 
 	return PaginationQuery{Page: page, PerPage: perPage}
@@ -68,12 +75,12 @@ type CursorMeta struct {
 
 func NewCursorQuery(c *gin.Context) CursorQuery {
 	cursor := c.Query("cursor")
-	limit, _ := strconv.Atoi(c.DefaultQuery("limit", c.DefaultQuery("per_page", "10")))
+	limit, _ := strconv.Atoi(c.DefaultQuery("limit", c.DefaultQuery("per_page", strconv.Itoa(DefaultPerPage))))
 	if limit < 1 {
-		limit = 10
+		limit = DefaultPerPage
 	}
-	if limit > 100 {
-		limit = 100
+	if limit > MaxPerPage {
+		limit = MaxPerPage
 	}
 	return CursorQuery{Cursor: cursor, Limit: limit}
 }

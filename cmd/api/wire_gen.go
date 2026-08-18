@@ -10,6 +10,9 @@ import (
 	"codebasego/internal/modules/auth"
 	"codebasego/internal/modules/graphql"
 	"codebasego/internal/modules/health"
+	"codebasego/internal/modules/page"
+	"codebasego/internal/modules/seo"
+	"codebasego/internal/modules/setting"
 	"codebasego/internal/modules/user"
 	"codebasego/internal/platform/config"
 	"codebasego/internal/platform/database"
@@ -48,15 +51,27 @@ func InitializeApp() (*App, error) {
 	authService := auth.NewService(configConfig, service, gormRefreshTokenRepository, eventBus)
 	handler := auth.NewHandler(authService)
 	module := auth.NewModule(handler, authService)
-	userHandler := user.NewHandler(service)
+	pageGormRepository := page.NewGormRepository(db)
+	pageService := page.NewService(pageGormRepository)
+	pageHandler := page.NewHandler(pageService)
 	authMiddleware := auth.ProvideAuthMiddleware(module)
+	pageModule := page.NewModule(pageHandler, authMiddleware)
+	seoGormRepository := seo.NewGormRepository(db)
+	seoService := seo.NewService(seoGormRepository)
+	seoHandler := seo.NewHandler(seoService)
+	seoModule := seo.NewModule(seoHandler, authMiddleware)
+	settingGormRepository := setting.NewGormRepository(db)
+	settingService := setting.NewService(settingGormRepository)
+	settingHandler := setting.NewHandler(settingService)
+	settingModule := setting.NewModule(settingHandler, authMiddleware)
+	userHandler := user.NewHandler(service)
 	userModule := user.NewModule(userHandler, authMiddleware)
-	v := ProvideMigrators(module, userModule)
+	v := ProvideMigrators(module, pageModule, seoModule, settingModule, userModule)
 	resolver := graphql.NewResolver(service, authService)
 	graphqlModule := graphql.NewModule(resolver, configConfig, authService)
 	healthHandler := health.NewHandler(db, client)
 	healthModule := health.NewModule(healthHandler)
-	v2 := ProvideRouteRegistrars(module, graphqlModule, healthModule, userModule)
+	v2 := ProvideRouteRegistrars(module, graphqlModule, healthModule, pageModule, seoModule, settingModule, userModule)
 	v3 := ProvideBackgroundWorkers(module)
 	app, err := NewApp(db, serverServer, outboxProcessor, v, v2, v3, eventBus)
 	if err != nil {
