@@ -29,7 +29,10 @@ func NewDB(cfg *config.Config) (*gorm.DB, error) {
 		if cfg.DB.DSN == "" {
 			return nil, fmt.Errorf("postgres DSN cannot be empty")
 		}
-		dialector = postgres.Open(cfg.DB.DSN)
+		dialector = postgres.New(postgres.Config{
+			DSN:                  cfg.DB.DSN,
+			PreferSimpleProtocol: true, // required for connection poolers (Supabase Supavisor, PgBouncer)
+		})
 
 	case "sqlite", "":
 		dsn := cfg.DB.DSN

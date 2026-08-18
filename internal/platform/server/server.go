@@ -59,7 +59,11 @@ func NewServer(cfg *config.Config, log zerolog.Logger, rdb *platformRedis.Client
 }
 
 func (s *Server) Run() error {
-	addr := fmt.Sprintf(":%s", s.Config.Server.Port)
+	port := s.Config.Server.Port
+	if envPort := os.Getenv("PORT"); envPort != "" {
+		port = envPort
+	}
+	addr := fmt.Sprintf(":%s", port)
 	srv := &http.Server{
 		Addr:              addr,
 		Handler:           s.Engine,

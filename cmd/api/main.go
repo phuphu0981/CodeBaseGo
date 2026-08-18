@@ -3,9 +3,11 @@ package main
 import (
 	"context"
 	"log"
+	"net/http"
 	"sync"
 	"time"
 
+	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 	"gorm.io/gorm"
@@ -114,6 +116,16 @@ func NewApp(
 	if srv.Config.Server.Mode != "release" && srv.Config.Server.Mode != "production" {
 		srv.Engine.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	}
+
+	// Root endpoint
+	srv.Engine.GET("/", func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{
+			"status":  "ok",
+			"message": "CodebaseGo API is running",
+			"docs":    "/swagger/index.html",
+			"health":  "/api/v1/health",
+		})
+	})
 
 	v1 := srv.Engine.Group("/api/v1")
 	for _, r := range registrars {
