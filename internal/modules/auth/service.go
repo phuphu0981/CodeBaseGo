@@ -14,10 +14,14 @@ import (
 	"codebasego/internal/platform/config"
 )
 
+// Precomputed bcrypt dummy hash to prevent email enumeration timing attacks
+const dummyBcryptHash = "$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy"
+
 // Claims represents the JWT access token payload.
 type Claims struct {
 	UserID string `json:"user_id"`
 	Email  string `json:"email"`
+	Role   string `json:"role"`
 	jwt.RegisteredClaims
 }
 
@@ -82,6 +86,8 @@ func (s *Service) Register(ctx context.Context, email, password, name string) (*
 func (s *Service) Login(ctx context.Context, email, password string) (*user.User, error) {
 	entity, err := s.userService.GetByEmail(ctx, email)
 	if err != nil {
+		// Prevent email enumeration via timing attack by performing a dummy bcrypt check
+		_ = bcrypt.CompareHashAndPassword([]byte(dummyBcryptHash), []byte(password))
 		return nil, common.ErrUnauthorized
 	}
 
@@ -93,12 +99,18 @@ func (s *Service) Login(ctx context.Context, email, password string) (*user.User
 }
 
 // GenerateTokenPair creates both an Access Token and a Refresh Token (persisted to DB).
-func (s *Service) GenerateTokenPair(ctx context.Context, userID, email string) (*TokenResponse, error) {
+func (s *Service) GenerateTokenPair(ctx context.Context, userID, email string, role ...string) (*TokenResponse, error) {
+	userRole := "user"
+	if len(role) > 0 && role[0] != "" {
+		userRole = role[0]
+	}
+
 	// 1. Generate Access Token (JWT)
 	accessExpireDuration := time.Duration(s.cfg.JWT.AccessExpireMinute) * time.Minute
 	accessClaims := Claims{
 		UserID: userID,
 		Email:  email,
+		Role:   userRole,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(accessExpireDuration)),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
@@ -155,11 +167,17 @@ func (s *Service) RefreshToken(ctx context.Context, refreshTokenStr string) (*To
 		return nil, common.ErrUnauthorized
 	}
 
+	userRole := u.Role
+	if userRole == "" {
+		userRole = "user"
+	}
+
 	// 1. Generate Access Token (JWT)
 	accessExpireDuration := time.Duration(s.cfg.JWT.AccessExpireMinute) * time.Minute
 	accessClaims := Claims{
 		UserID: u.ID,
 		Email:  u.Email,
+		Role:   userRole,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(accessExpireDuration)),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),

@@ -13,6 +13,9 @@ import (
 	"codebasego/internal/modules/auth"
 	"codebasego/internal/modules/graphql"
 	"codebasego/internal/modules/health"
+	"codebasego/internal/modules/page"
+	"codebasego/internal/modules/seo"
+	"codebasego/internal/modules/setting"
 	"codebasego/internal/modules/user"
 	"codebasego/internal/platform/config"
 	"codebasego/internal/platform/database"
@@ -73,12 +76,30 @@ func initServer() {
 	healthHandler := health.NewHandler(db, rdb)
 	healthMod := health.NewModule(healthHandler)
 
+	pageRepo := page.NewGormRepository(db)
+	pageService := page.NewService(pageRepo)
+	pageHandler := page.NewHandler(pageService)
+	pageMod := page.NewModule(pageHandler, authMiddleware)
+
+	seoRepo := seo.NewGormRepository(db)
+	seoService := seo.NewService(seoRepo)
+	seoHandler := seo.NewHandler(seoService)
+	seoMod := seo.NewModule(seoHandler, authMiddleware)
+
+	settingRepo := setting.NewGormRepository(db)
+	settingService := setting.NewService(settingRepo)
+	settingHandler := setting.NewHandler(settingService)
+	settingMod := setting.NewModule(settingHandler, authMiddleware)
+
 	if cfg.DB.AutoMigrate {
 		if outbox != nil {
 			_ = outbox.AutoMigrate(db)
 		}
 		_ = authMod.AutoMigrate(db)
 		_ = userMod.AutoMigrate(db)
+		_ = pageMod.AutoMigrate(db)
+		_ = seoMod.AutoMigrate(db)
+		_ = settingMod.AutoMigrate(db)
 	}
 
 	if cfg.Server.Mode != "release" && cfg.Server.Mode != "production" {
@@ -99,6 +120,9 @@ func initServer() {
 	gqlMod.RegisterRoutes(v1)
 	healthMod.RegisterRoutes(v1)
 	userMod.RegisterRoutes(v1)
+	pageMod.RegisterRoutes(v1)
+	seoMod.RegisterRoutes(v1)
+	settingMod.RegisterRoutes(v1)
 }
 
 // Handler is the entrypoint for Vercel Serverless Functions

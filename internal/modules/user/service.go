@@ -40,10 +40,15 @@ func (s *Service) Create(ctx context.Context, req *CreateRequest, hashedPassword
 	if err := req.Validate(); err != nil {
 		return nil, err
 	}
+	role := req.Role
+	if role == "" {
+		role = RoleUser
+	}
 	entity := &User{
 		Email:    req.Email,
 		Password: hashedPassword,
 		Name:     req.Name,
+		Role:     role,
 	}
 	if err := s.repo.Create(ctx, entity); err != nil {
 		return nil, err
@@ -75,6 +80,9 @@ func (s *Service) Update(ctx context.Context, id string, req *UpdateRequest) (*U
 	}
 	if req.Name != nil {
 		entity.Name = *req.Name
+	}
+	if req.Role != nil && *req.Role != "" {
+		entity.Role = *req.Role
 	}
 
 	if err := s.repo.Update(ctx, entity); err != nil {

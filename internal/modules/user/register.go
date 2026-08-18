@@ -42,7 +42,7 @@ func (m *Module) AutoMigrate(db *gorm.DB) error {
 // RegisterRoutes registers HTTP routes for the User module under /users.
 func (m *Module) RegisterRoutes(rg *gin.RouterGroup) {
 	group := rg.Group("/users", gin.HandlerFunc(m.authMiddleware))
-	group.GET("", m.handler.List)
+	group.GET("", common.RequireRole("admin"), m.handler.List)
 	group.GET("/:id", m.handler.GetByID)
 	group.PUT("/:id", m.handler.Update)
 	group.DELETE("/:id", m.handler.Delete)

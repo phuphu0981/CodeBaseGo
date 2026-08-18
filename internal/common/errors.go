@@ -2,7 +2,6 @@ package common
 
 import (
 	"fmt"
-	"net/mail"
 )
 
 // AppError represents a structured application error.
@@ -27,10 +26,4 @@ var (
 	ErrConflict     = NewAppError(409, "resource already exists")
 	ErrInternal     = NewAppError(500, "internal server error")
 )
-
-// IsValidEmail checks whether an email address format is valid.
-func IsValidEmail(email string) bool {
-	addr, err := mail.ParseAddress(email)
-	return err == nil && addr.Address == email
-}
 

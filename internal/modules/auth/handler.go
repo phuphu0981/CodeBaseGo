@@ -46,7 +46,7 @@ func (h *Handler) Register(c *gin.Context) {
 		return
 	}
 
-	tokenPair, err := h.service.GenerateTokenPair(c.Request.Context(), entity.ID, entity.Email)
+	tokenPair, err := h.service.GenerateTokenPair(c.Request.Context(), entity.ID, entity.Email, entity.Role)
 	if err != nil {
 		response.InternalServerError(c)
 		return
@@ -78,7 +78,7 @@ func (h *Handler) Login(c *gin.Context) {
 		return
 	}
 
-	tokenPair, err := h.service.GenerateTokenPair(c.Request.Context(), entity.ID, entity.Email)
+	tokenPair, err := h.service.GenerateTokenPair(c.Request.Context(), entity.ID, entity.Email, entity.Role)
 	if err != nil {
 		response.InternalServerError(c)
 		return

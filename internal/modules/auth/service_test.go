@@ -161,10 +161,16 @@ func TestAuthService(t *testing.T) {
 		if err == nil {
 			t.Fatal("expected unauthorized error for wrong password")
 		}
+
+		// Login with non-existent email fails safely
+		_, err = svc.Login(ctx, "nonexistent@example.com", "password123")
+		if err == nil {
+			t.Fatal("expected unauthorized error for non-existent email")
+		}
 	})
 
-	t.Run("Generate and Validate Token", func(t *testing.T) {
-		pair, err := svc.GenerateTokenPair(ctx, "user-1", "test@example.com")
+	t.Run("Generate and Validate Token with Role", func(t *testing.T) {
+		pair, err := svc.GenerateTokenPair(ctx, "user-1", "test@example.com", "admin")
 		if err != nil {
 			t.Fatalf("unexpected error generating token pair: %v", err)
 		}
@@ -173,7 +179,7 @@ func TestAuthService(t *testing.T) {
 		if err != nil {
 			t.Fatalf("unexpected error validating token: %v", err)
 		}
-		if claims.UserID != "user-1" || claims.Email != "test@example.com" {
+		if claims.UserID != "user-1" || claims.Email != "test@example.com" || claims.Role != "admin" {
 			t.Fatalf("claims mismatch: %+v", claims)
 		}
 	})

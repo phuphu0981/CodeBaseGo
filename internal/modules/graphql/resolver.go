@@ -19,7 +19,7 @@ type UserService interface {
 type AuthService interface {
 	Register(ctx context.Context, email, password, name string) (*user.User, error)
 	Login(ctx context.Context, email, password string) (*user.User, error)
-	GenerateTokenPair(ctx context.Context, userID, email string) (*auth.TokenResponse, error)
+	GenerateTokenPair(ctx context.Context, userID, email string, role ...string) (*auth.TokenResponse, error)
 	RefreshToken(ctx context.Context, refreshTokenStr string) (*auth.TokenResponse, error)
 	Logout(ctx context.Context, refreshTokenStr string) error
 	LogoutAll(ctx context.Context, userID string) error

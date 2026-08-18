@@ -11,7 +11,7 @@ func (r *mutationResolver) Register(ctx context.Context, input RegisterInput) (*
 		return nil, err
 	}
 
-	pair, err := r.authService.GenerateTokenPair(ctx, u.ID, u.Email)
+	pair, err := r.authService.GenerateTokenPair(ctx, u.ID, u.Email, u.Role)
 	if err != nil {
 		return nil, err
 	}
@@ -31,7 +31,7 @@ func (r *mutationResolver) Login(ctx context.Context, input LoginInput) (*TokenP
 		return nil, err
 	}
 
-	pair, err := r.authService.GenerateTokenPair(ctx, u.ID, u.Email)
+	pair, err := r.authService.GenerateTokenPair(ctx, u.ID, u.Email, u.Role)
 	if err != nil {
 		return nil, err
 	}

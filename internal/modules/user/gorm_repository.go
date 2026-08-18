@@ -128,6 +128,9 @@ func (r *GormRepository) Update(ctx context.Context, entity *User) error {
 	if entity.Password != "" {
 		updates["password"] = entity.Password
 	}
+	if entity.Role != "" {
+		updates["role"] = entity.Role
+	}
 	res := database.GetDB(ctx, r.db).Model(&User{}).Where("id = ?", entity.ID).Updates(updates)
 	if res.Error != nil {
 		if errors.Is(res.Error, gorm.ErrDuplicatedKey) || isDuplicateError(res.Error) {

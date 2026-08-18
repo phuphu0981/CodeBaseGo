@@ -150,7 +150,7 @@ if tokens >= 1 then
     allowed = 1
 end
 
-redis.call('HMSET', key, 'tokens', tokens, 'last_update', last_update)
+redis.call('HSET', key, 'tokens', tokens, 'last_update', last_update)
 local expireSec = math.ceil(burst / math.max(1, rps)) + 60
 redis.call('EXPIRE', key, expireSec)
 

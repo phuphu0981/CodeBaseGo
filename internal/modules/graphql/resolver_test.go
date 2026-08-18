@@ -54,7 +54,7 @@ func (m *mockGQLAuthService) Login(ctx context.Context, email, password string) 
 	return &user.User{ID: "user-1", Email: email, Name: "User 1", CreatedAt: time.Now(), UpdatedAt: time.Now()}, nil
 }
 
-func (m *mockGQLAuthService) GenerateTokenPair(ctx context.Context, userID, email string) (*auth.TokenResponse, error) {
+func (m *mockGQLAuthService) GenerateTokenPair(ctx context.Context, userID, email string, role ...string) (*auth.TokenResponse, error) {
 	return &auth.TokenResponse{
 		AccessToken:  "access-token-123",
 		RefreshToken: "refresh-token-123",

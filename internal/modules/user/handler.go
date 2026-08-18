@@ -139,10 +139,15 @@ func (h *Handler) Delete(c *gin.Context) {
 }
 
 func toResponse(e *User) Response {
+	role := e.Role
+	if role == "" {
+		role = RoleUser
+	}
 	return Response{
 		ID:        e.ID,
 		Email:     e.Email,
 		Name:      e.Name,
+		Role:      role,
 		CreatedAt: e.CreatedAt.Format(time.RFC3339),
 		UpdatedAt: e.UpdatedAt.Format(time.RFC3339),
 	}

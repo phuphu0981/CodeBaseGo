@@ -47,8 +47,8 @@ func (m *Module) RegisterRoutes(rg *gin.RouterGroup) {
 	group.GET("/public", m.handler.GetPublic)
 	group.GET("/by-path", m.handler.GetByPath)
 
-	// Protected management routes
-	protected := group.Group("", gin.HandlerFunc(m.authMiddleware))
+	// Protected management routes (Admin only)
+	protected := group.Group("", gin.HandlerFunc(m.authMiddleware), common.RequireRole("admin"))
 	protected.GET("", m.handler.List)
 	protected.GET("/:id", m.handler.GetByID)
 	protected.POST("", m.handler.Set)
