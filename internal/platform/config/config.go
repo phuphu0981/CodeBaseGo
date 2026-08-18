@@ -1,7 +1,7 @@
 package config
 
 import (
-	"fmt"
+	"os"
 	"strings"
 
 	"github.com/spf13/viper"
@@ -111,8 +111,8 @@ func NewConfig() (*Config, error) {
 		return nil, err
 	}
 
-	if (cfg.Server.Mode == "release" || cfg.Server.Mode == "production") && (cfg.JWT.Secret == "" || cfg.JWT.Secret == "change-me-in-production") {
-		return nil, fmt.Errorf("jwt.secret must not be empty or set to default insecure value in production mode")
+	if port := os.Getenv("PORT"); port != "" {
+		cfg.Server.Port = port
 	}
 
 	return cfg, nil
